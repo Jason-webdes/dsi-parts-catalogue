@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mimaki Parts Lookup</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 20px;
+      max-width: 1200px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    input, select {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+    }
+    th {
+      background: #f4f4f4;
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mimaki Parts Lookup</h1>
+
+  <div class="filters">
+    <input id="searchInput" type="text" placeholder="Search by model, part name or code…">
+    <select id="modelFilter">
+      <option value="">All Models</option>
+    </select>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Part Name</th>
+        <th>Part Code</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody id="partsTableBody"></tbody>
+  </table>
+
+  <script>
+    const parts = [
+      {
+        model: "JV150-160",
+        partName: "Print Head",
+        partCode: "M015372",
+        category: "Head",
+        status: "Order Only",
+        notes: "Requires technician installation"
+      },
+      {
+        model: "CJV300-130",
+        partName: "Capping Station",
+        partCode: "SPA-0297",
+        category: "Maintenance",
+        status: "In Stock",
+        notes: "Common replacement every 6–12 months"
+      },
+      {
+        model: "JV150-160",
+        partName: "Wiper",
+        partCode: "SPA-0243",
+        category: "Maintenance",
+        status: "In Stock",
+        notes: ""
+      }
+    ];
+
+    const searchInput = document.getElementById('searchInput');
+    const modelFilter = document.getElementById('modelFilter');
+    const tableBody = document.getElementById('partsTableBody');
+
+    const models = [...new Set(parts.map(p => p.model))].sort();
+    models.forEach(model => {
+      const opt = document.createElement('option');
+      opt.value = model;
+      opt.textContent = model;
+      modelFilter.appendChild(opt);
+    });
+
+    function renderTable() {
+      const search = searchInput.value.toLowerCase().trim();
+      const model = modelFilter.value;
+
+      tableBody.innerHTML = '';
+
+      const filtered = parts.filter(p => {
+        const matchesModel = !model || p.model === model;
+        const text = `${p.model} ${p.partName} ${p.partCode} ${p.category} ${p.status} ${p.notes}`.toLowerCase();
+        const matchesSearch = !search || text.includes(search);
+        return matchesModel && matchesSearch;
+      });
+
+      filtered.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.model}</td>
+          <td>${p.partName}</td>
+          <td>${p.partCode}</td>
+          <td>${p.category}</td>
+          <td>${p.status}</td>
+          <td>${p.notes}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    searchInput.addEventListener('input', renderTable);
+    modelFilter.addEventListener('change', renderTable);
+
+    renderTable();
+  </script>
+</body>
+</html>
